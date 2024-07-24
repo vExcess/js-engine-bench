@@ -1,0 +1,198 @@
+/*
+    modified from https://github.com/nodeca/glur/blob/master/index.js
+*/
+
+function convolveRGBA(src, out, line, coeff, width, height) {
+    // for guassian blur
+    // takes src image and writes the blurred and transposed result into out
+    var rgba;
+    var prev_src_r, prev_src_g, prev_src_b, prev_src_a;
+    var curr_src_r, curr_src_g, curr_src_b, curr_src_a;
+    var curr_out_r, curr_out_g, curr_out_b, curr_out_a;
+    var prev_out_r, prev_out_g, prev_out_b, prev_out_a;
+    var prev_prev_out_r, prev_prev_out_g, prev_prev_out_b, prev_prev_out_a;
+
+    var src_index, out_index, line_index;
+    var i, j;
+    var coeff_a0, coeff_a1, coeff_b1, coeff_b2;
+
+    for (i = 0; i < height; i++) {
+        src_index = i * width;
+        out_index = i;
+        line_index = 0;
+
+        // left to right
+        rgba = src[src_index];
+
+        prev_src_r = rgba & 0xff;
+        prev_src_g = (rgba >> 8) & 0xff;
+        prev_src_b = (rgba >> 16) & 0xff;
+        prev_src_a = (rgba >> 24) & 0xff;
+
+        prev_prev_out_r = prev_src_r * coeff[6];
+        prev_prev_out_g = prev_src_g * coeff[6];
+        prev_prev_out_b = prev_src_b * coeff[6];
+        prev_prev_out_a = prev_src_a * coeff[6];
+
+        prev_out_r = prev_prev_out_r;
+        prev_out_g = prev_prev_out_g;
+        prev_out_b = prev_prev_out_b;
+        prev_out_a = prev_prev_out_a;
+
+        coeff_a0 = coeff[0];
+        coeff_a1 = coeff[1];
+        coeff_b1 = coeff[4];
+        coeff_b2 = coeff[5];
+
+        for (j = 0; j < width; j++) {
+            rgba = src[src_index];
+            curr_src_r = rgba & 0xff;
+            curr_src_g = (rgba >> 8) & 0xff;
+            curr_src_b = (rgba >> 16) & 0xff;
+            curr_src_a = (rgba >> 24) & 0xff;
+
+            curr_out_r = curr_src_r * coeff_a0 + prev_src_r * coeff_a1 + prev_out_r * coeff_b1 + prev_prev_out_r * coeff_b2;
+            curr_out_g = curr_src_g * coeff_a0 + prev_src_g * coeff_a1 + prev_out_g * coeff_b1 + prev_prev_out_g * coeff_b2;
+            curr_out_b = curr_src_b * coeff_a0 + prev_src_b * coeff_a1 + prev_out_b * coeff_b1 + prev_prev_out_b * coeff_b2;
+            curr_out_a = curr_src_a * coeff_a0 + prev_src_a * coeff_a1 + prev_out_a * coeff_b1 + prev_prev_out_a * coeff_b2;
+
+            prev_prev_out_r = prev_out_r;
+            prev_prev_out_g = prev_out_g;
+            prev_prev_out_b = prev_out_b;
+            prev_prev_out_a = prev_out_a;
+
+            prev_out_r = curr_out_r;
+            prev_out_g = curr_out_g;
+            prev_out_b = curr_out_b;
+            prev_out_a = curr_out_a;
+
+            prev_src_r = curr_src_r;
+            prev_src_g = curr_src_g;
+            prev_src_b = curr_src_b;
+            prev_src_a = curr_src_a;
+
+            line[line_index] = prev_out_r;
+            line[line_index + 1] = prev_out_g;
+            line[line_index + 2] = prev_out_b;
+            line[line_index + 3] = prev_out_a;
+            line_index += 4;
+            src_index++;
+        }
+
+        src_index--;
+        line_index -= 4;
+        out_index += height * (width - 1);
+
+        // right to left
+        rgba = src[src_index];
+
+        prev_src_r = rgba & 0xff;
+        prev_src_g = (rgba >> 8) & 0xff;
+        prev_src_b = (rgba >> 16) & 0xff;
+        prev_src_a = (rgba >> 24) & 0xff;
+
+        prev_prev_out_r = prev_src_r * coeff[7];
+        prev_prev_out_g = prev_src_g * coeff[7];
+        prev_prev_out_b = prev_src_b * coeff[7];
+        prev_prev_out_a = prev_src_a * coeff[7];
+
+        prev_out_r = prev_prev_out_r;
+        prev_out_g = prev_prev_out_g;
+        prev_out_b = prev_prev_out_b;
+        prev_out_a = prev_prev_out_a;
+
+        curr_src_r = prev_src_r;
+        curr_src_g = prev_src_g;
+        curr_src_b = prev_src_b;
+        curr_src_a = prev_src_a;
+
+        coeff_a0 = coeff[2];
+        coeff_a1 = coeff[3];
+
+        for (j = width - 1; j >= 0; j--) {
+            curr_out_r = curr_src_r * coeff_a0 + prev_src_r * coeff_a1 + prev_out_r * coeff_b1 + prev_prev_out_r * coeff_b2;
+            curr_out_g = curr_src_g * coeff_a0 + prev_src_g * coeff_a1 + prev_out_g * coeff_b1 + prev_prev_out_g * coeff_b2;
+            curr_out_b = curr_src_b * coeff_a0 + prev_src_b * coeff_a1 + prev_out_b * coeff_b1 + prev_prev_out_b * coeff_b2;
+            curr_out_a = curr_src_a * coeff_a0 + prev_src_a * coeff_a1 + prev_out_a * coeff_b1 + prev_prev_out_a * coeff_b2;
+
+            prev_prev_out_r = prev_out_r;
+            prev_prev_out_g = prev_out_g;
+            prev_prev_out_b = prev_out_b;
+            prev_prev_out_a = prev_out_a;
+
+            prev_out_r = curr_out_r;
+            prev_out_g = curr_out_g;
+            prev_out_b = curr_out_b;
+            prev_out_a = curr_out_a;
+
+            prev_src_r = curr_src_r;
+            prev_src_g = curr_src_g;
+            prev_src_b = curr_src_b;
+            prev_src_a = curr_src_a;
+
+            rgba = src[src_index];
+            curr_src_r = rgba & 0xff;
+            curr_src_g = (rgba >> 8) & 0xff;
+            curr_src_b = (rgba >> 16) & 0xff;
+            curr_src_a = (rgba >> 24) & 0xff;
+
+            rgba = ((line[line_index] + prev_out_r) << 0) +
+                ((line[line_index + 1] + prev_out_g) << 8) +
+                ((line[line_index + 2] + prev_out_b) << 16) +
+                ((line[line_index + 3] + prev_out_a) << 24);
+
+            out[out_index] = rgba;
+
+            src_index--;
+            line_index -= 4;
+            out_index -= height;
+        }
+    }
+};
+
+function benchit() {
+    var imageData = {
+        width: 800,
+        height: 800,
+        data: new Uint8ClampedArray(800 * 800 * 4)
+    };
+    let x = 0;
+    let y = 0;
+    let w = 800;
+    let h = 800;
+    var param = x;
+    var p = imageData.data;
+
+    var a0, a1, a2, a3, b1, b2, left_corner, right_corner;
+
+    // Unify input data type, to keep convolver calls isomorphic
+    var src32 = new Uint32Array(p.buffer);
+
+    var out = new Uint32Array(src32.length);
+    var tmp_line = new Float32Array(Math.max(w, h) * 4);
+
+    // gaussCoef
+    var sigma = param ?? 1;
+    if (sigma < 0.5) {
+        sigma = 0.5;
+    }
+    
+    var a = Math.exp(0.726 * 0.726) / sigma,
+        g1 = Math.exp(-a),
+        g2 = Math.exp(-2 * a),
+        k = (1 - g1) * (1 - g1) / (1 + 2 * a * g1 - g2);
+    
+    a0 = k;
+    a1 = k * (a - 1) * g1;
+    a2 = k * (a + 1) * g1;
+    a3 = -k * g2;
+    b1 = 2 * g1;
+    b2 = -g2;
+    left_corner = (a0 + a1) / (1 - b1 - b2);
+    right_corner = (a2 + a3) / (1 - b1 - b2);
+    
+    var coeff = new Float32Array([a0, a1, a2, a3, b1, b2, left_corner, right_corner]);
+
+    convolveRGBA(src32, out, tmp_line, coeff, w, h, sigma);
+    convolveRGBA(out, src32, tmp_line, coeff, h, w, sigma);
+}
