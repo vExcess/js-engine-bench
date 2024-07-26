@@ -36,6 +36,8 @@ lib-cov
 coverage
 *.lcov
 
+temp.js
+
 # nyc test coverage
 
 .nyc_output

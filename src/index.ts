@@ -1,7 +1,9 @@
+const pause = 3000;
+const timeout = 120000;
+const benchtime = 3000;
+
 const fs = require("fs");
 const BashShell = require("./BashShell.js");
-
-const scripts = fs.readdirSync("./benchmark-scripts");
 
 type ShellEvent = {
     process: string,
@@ -13,8 +15,7 @@ const sh = new BashShell("runner");
 let runtime = 0;
 sh.handler = (e: ShellEvent) => {
     if (e.data) {
-        console.log(JSON.stringify(e.data));
-        const parsedValue = Number(e.data);
+        const parsedValue = Number(e.data.slice(0, e.data.indexOf("\n")));
         if (typeof parsedValue === "number" && !Number.isNaN(parsedValue)) {
             runtime = Math.round(parsedValue);
         }
@@ -39,7 +40,7 @@ let runtimes = {
 
 async function wait() {
     return new Promise((resolve) => {
-        setTimeout(resolve, 3000);
+        setTimeout(resolve, pause);
     });
 }
 
@@ -50,7 +51,7 @@ async function runEngine(engineName: string, scriptName: string, cmd: string) {
     runtime = -1;
 
     const start = Date.now();
-    await sh.send(cmd, 30000);
+    await sh.send(cmd, timeout);
     const end = Date.now();
 
     const engineNameKey = engineName as keyof typeof runtimes;
@@ -79,7 +80,7 @@ async function benchScript(scriptName: string) {
             print = console.log;
         }
         const get_milliseconds = Date.now;
-        const TIME_LIMIT = 3000;
+        const TIME_LIMIT = ${benchtime};
     ` + "\n" + contents + `
         const start = get_milliseconds();
         let iterations = 0;
@@ -95,14 +96,14 @@ async function benchScript(scriptName: string) {
     fs.writeFileSync("./temp.js", tempContents);
 
     // run benchmark
-    // await runEngine("bun", scriptName, "bun run ./temp.js");
-    // await runEngine("node", scriptName, "node ./temp.js");
-    // await runEngine("node (jitless)", scriptName, "node --jitless ./temp.js");
-    // await runEngine("hermes", scriptName, "hermes ./temp.js");
-    // await runEngine("shermes", scriptName, "shermes -O -exec ./temp.js");
-    // await runEngine("quickjs", scriptName, "qjs ./temp.js");
+    await runEngine("bun", scriptName, "bun run ./temp.js");
+    await runEngine("node", scriptName, "node ./temp.js");
+    await runEngine("node (jitless)", scriptName, "node --jitless ./temp.js");
+    await runEngine("hermes", scriptName, "hermes ./temp.js");
+    await runEngine("shermes", scriptName, "shermes -O -exec ./temp.js");
+    await runEngine("quickjs", scriptName, "qjs ./temp.js");
     await runEngine("kiesel", scriptName, "kiesel temp.js");
-    // await runEngine("boa", scriptName, "kiesel ./temp.js");
+    await runEngine("boa", scriptName, "boa ./temp.js");
 }
 
 async function main() {
@@ -111,7 +112,7 @@ async function main() {
         "mandelbrot",
         "prime-factors",
         "gaussian-blur"
-    ]
+    ];
 
     // run benchmarks
     for (let i = 0; i < scriptNames.length; i++) {
@@ -122,32 +123,45 @@ async function main() {
     sh.kill();
     fs.unlinkSync("./temp.js");
 
-    // generate results table
-    const table = [
-        ["", ...scriptNames],
-    ];
-
+    // create table
+    const statRows = [];
     for (const engineName in runtimes) {
         const engineNameKey = engineName as keyof typeof runtimes;
         const stats = runtimes[engineNameKey];
 
         let row = [engineName];
+        let avg = 0;
+        let crashes = 0;
         for (let i = 0; i < scriptNames.length; i++) {
-            const str = "" + stats.get(scriptNames[i])?.time;
+            const time = stats.get(scriptNames[i])?.time as number;
+            if (time !== -1) {
+                avg += time;
+            } else {
+                crashes++;
+            }
+            const str = "" + time;
             row.push(str);
         }
-        table.push(row);
+        row.push("" + Math.round(avg / (scriptNames.length - crashes)));
+        statRows.push(row);
     }
 
-    // display results
-    console.log("\nResults in milliseconds (lower is better):");
-    table.forEach((row) => {
+    statRows.sort((a, b) => {
+        return Number(a[scriptNames.length + 1]) - Number(b[scriptNames.length + 1]);
+    });
+    
+    function displayRow(row: string[]) {
         row[0] = row[0].padEnd(15, " ") + "|";
         for (let i = 1; i < row.length; i++) {
             row[i] = row[i].padStart(14, " ") + "|";
         }
         console.log("| " + row.join(""));
-    });
+    }
+
+    // display results
+    console.log("\nResults in milliseconds (lower is better):");
+    displayRow(["", ...scriptNames, "average"]);
+    statRows.forEach(displayRow);
 }
 
 main();

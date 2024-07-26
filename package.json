@@ -1,6 +1,5 @@
 {
-  "name": "ez-js-bench",
-  "module": "index.ts",
+  "name": "js-engine-bench",
   "devDependencies": {
     "@types/bun": "latest"
   },
