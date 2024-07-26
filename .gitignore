@@ -1,5 +1,11 @@
 # Based on https://raw.githubusercontent.com/github/gitignore/main/Node.gitignore
 
+temp.js
+boa
+kiesel
+qjs
+.boa_history
+
 # Logs
 
 logs
@@ -9,8 +15,6 @@ yarn-debug.log*
 yarn-error.log*
 lerna-debug.log*
 .pnpm-debug.log*
-
-.boa_history
 
 # Caches
 
@@ -35,8 +39,6 @@ lib-cov
 
 coverage
 *.lcov
-
-temp.js
 
 # nyc test coverage
 
