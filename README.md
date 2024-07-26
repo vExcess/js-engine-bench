@@ -14,15 +14,6 @@ I normally use Bun for running TS, but for some reason the benchmark crashes whe
 - prime factors :: searches for number with the most prime factors
 - gaussian blur :: computes a gaussian blur on an image
 
-### Supported Engines
-- Node
-- Bun
-- Hermes
-- Static Hermes
-- QuickJS
-
-Support for more engines is very easy to add, but these are the only engines that I'm interested it.
-
 ### Execution
 Each benchmark is run on each engine for 3 seconds with a 3 second pause between each run to give the CPU a chance to cool down. The time to execute each script is then tracked in milliseconds. I've calibrated each script to take roughly same amount of time on Node.
 
@@ -52,6 +43,10 @@ by far the slowest JS engine of the ones tested.
 | quickjs        |           36.2|
 | boa            |          380.5|
 | kiesel         |         1728.0|
+
+### Note
+Adding support for more engines is easy, but the engines benchmarked above are the only ones
+that I was interested in.
 
 ### Temporarily Add Engines to Path
 ```
