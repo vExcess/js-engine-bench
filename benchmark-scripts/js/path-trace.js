@@ -11,10 +11,10 @@ function normalize(v) {
 function reflect(v, n) {
     var dn = v[0] * n[0] + v[1] * n[1] + v[2] * n[2];
     return [
-            v[0] - 2 * n[0] * dn,
-            v[1] - 2 * n[1] * dn,
-            v[2] - 2 * n[2] * dn
-        ];
+        v[0] - 2 * n[0] * dn,
+        v[1] - 2 * n[1] * dn,
+        v[2] - 2 * n[2] * dn
+    ];
 }
 
 function uniformVec() {
@@ -36,8 +36,7 @@ function lerp(value1, value2, amt){
     return ((value2 - value1)*amt) + value1;
 }//}
 
-var sky = [0.8, 0.9, 1];
-sky = [0.7, 0.9, 1];
+var sky = [0.7, 0.9, 1];
 
 function traceSphere(o, d, s, mat) {
     var oc = [o[0] - s[0], o[1] - s[1], o[2] - s[2]];
@@ -134,10 +133,6 @@ function pathTrace(o, d, s) {
     
     return col;
 }
-
-var colorBuffer = new Float32Array(400*400*4).fill(0);
-
-//var j = 0;
 
 var its = 1;
 

@@ -1,20 +1,21 @@
-/*
-    modified from https://github.com/nodeca/glur/blob/master/index.js
-*/
+import 'dart:typed_data';
+import 'dart:math' as Math;
 
-function convolveRGBA(src, out, line, coeff, width, height) {
+// END IMPORTS
+
+void convolveRGBA(Uint32List src, Uint32List out, Float32List line, Float32List coeff, int width, int height) {
     // for guassian blur
     // takes src image and writes the blurred and transposed result into out
-    var rgba;
-    var prev_src_r, prev_src_g, prev_src_b, prev_src_a;
-    var curr_src_r, curr_src_g, curr_src_b, curr_src_a;
-    var curr_out_r, curr_out_g, curr_out_b, curr_out_a;
-    var prev_out_r, prev_out_g, prev_out_b, prev_out_a;
-    var prev_prev_out_r, prev_prev_out_g, prev_prev_out_b, prev_prev_out_a;
+    int rgba;
+    int prev_src_r, prev_src_g, prev_src_b, prev_src_a;
+    int curr_src_r, curr_src_g, curr_src_b, curr_src_a;
+    double curr_out_r, curr_out_g, curr_out_b, curr_out_a;
+    double prev_out_r, prev_out_g, prev_out_b, prev_out_a;
+    double prev_prev_out_r, prev_prev_out_g, prev_prev_out_b, prev_prev_out_a;
 
-    var src_index, out_index, line_index;
-    var i, j;
-    var coeff_a0, coeff_a1, coeff_b1, coeff_b2;
+    int src_index, out_index, line_index;
+    int i, j;
+    double coeff_a0, coeff_a1, coeff_b1, coeff_b2;
 
     for (i = 0; i < height; i++) {
         src_index = i * width;
@@ -136,10 +137,10 @@ function convolveRGBA(src, out, line, coeff, width, height) {
             curr_src_b = (rgba >> 16) & 0xff;
             curr_src_a = (rgba >> 24) & 0xff;
 
-            rgba = ((line[line_index] + prev_out_r) << 0) +
-                ((line[line_index + 1] + prev_out_g) << 8) +
-                ((line[line_index + 2] + prev_out_b) << 16) +
-                ((line[line_index + 3] + prev_out_a) << 24);
+            rgba = ((line[line_index] + prev_out_r).toInt() << 0) +
+                   ((line[line_index + 1] + prev_out_g).toInt() << 8) +
+                   ((line[line_index + 2] + prev_out_b).toInt() << 16) +
+                   ((line[line_index + 3] + prev_out_a).toInt() << 24);
 
             out[out_index] = rgba;
 
@@ -148,36 +149,36 @@ function convolveRGBA(src, out, line, coeff, width, height) {
             out_index -= height;
         }
     }
-};
+}
 
-function benchit() {
-    var imageData = {
-        width: 800,
-        height: 800,
-        data: new Uint8ClampedArray(800 * 800 * 4)
+void benchit() {
+    Map<String, dynamic> imageData = {
+        "width": 800,
+        "height": 800,
+        "data": new Uint8List(800 * 800 * 4)
     };
-    let x = 0;
-    let y = 0;
-    let w = 800;
-    let h = 800;
-    var param = x;
-    var p = imageData.data;
+    int x = 0;
+    int y = 0;
+    int w = 800;
+    int h = 800;
+    double radius = 0.5;
+    Uint8List p = imageData["data"];
 
-    var a0, a1, a2, a3, b1, b2, left_corner, right_corner;
+    double a0, a1, a2, a3, b1, b2, left_corner, right_corner;
 
     // Unify input data type, to keep convolver calls isomorphic
-    var src32 = new Uint32Array(p.buffer);
+    Uint32List src32 = new Uint32List.view(p.buffer);
 
-    var out = new Uint32Array(src32.length);
-    var tmp_line = new Float32Array(Math.max(w, h) * 4);
+    Uint32List out = new Uint32List(src32.length);
+    Float32List tmp_line = new Float32List(Math.max(w, h) * 4);
 
     // gaussCoef
-    var sigma = param ?? 1;
+    double sigma = radius;
     if (sigma < 0.5) {
         sigma = 0.5;
     }
     
-    var a = Math.exp(0.726 * 0.726) / sigma,
+    double a = Math.exp(0.726 * 0.726) / sigma,
         g1 = Math.exp(-a),
         g2 = Math.exp(-2 * a),
         k = (1 - g1) * (1 - g1) / (1 + 2 * a * g1 - g2);
@@ -191,8 +192,8 @@ function benchit() {
     left_corner = (a0 + a1) / (1 - b1 - b2);
     right_corner = (a2 + a3) / (1 - b1 - b2);
     
-    var coeff = new Float32Array([a0, a1, a2, a3, b1, b2, left_corner, right_corner]);
+    var coeff = new Float32List.fromList([a0, a1, a2, a3, b1, b2, left_corner, right_corner]);
 
-    convolveRGBA(src32, out, tmp_line, coeff, w, h, sigma);
-    convolveRGBA(out, src32, tmp_line, coeff, h, w, sigma);
+    convolveRGBA(src32, out, tmp_line, coeff, w, h);
+    convolveRGBA(out, src32, tmp_line, coeff, h, w);
 }

@@ -14,8 +14,11 @@ type ShellEvent = {
 const sh = new BashShell("runner");
 let runtime = 0;
 sh.handler = (e: ShellEvent) => {
-    if (e.data) {
-        const parsedValue = Number(e.data.slice(0, e.data.indexOf("\n")));
+    let res = e.data;
+    if (res) {
+        let endIdx = res.indexOf("\n");
+        if (endIdx === -1) endIdx = res.length;
+        const parsedValue = Number(res.slice(0, endIdx));
         if (typeof parsedValue === "number" && !Number.isNaN(parsedValue)) {
             runtime = Math.round(parsedValue);
         }
@@ -45,7 +48,7 @@ async function wait() {
 }
 
 async function runEngine(engineName: string, scriptName: string, cmd: string) {
-    // wait for 1s between runs to cool down the CPU
+    // wait for between runs to cool down the CPU
     await wait();
 
     runtime = -1;
@@ -73,7 +76,7 @@ async function benchScript(scriptName: string) {
     }
 
     // generate script
-    const contents = fs.readFileSync(`./benchmark-scripts/${scriptName}.js`);
+    const contents = fs.readFileSync(`./benchmark-scripts/js/${scriptName}.js`);
     const tempContents = `
         var print;
         if (typeof print === "undefined") {
@@ -96,14 +99,14 @@ async function benchScript(scriptName: string) {
     fs.writeFileSync("./temp.js", tempContents);
 
     // run benchmark
-    await runEngine("bun", scriptName, "bun run ./temp.js");
-    await runEngine("node", scriptName, "node ./temp.js");
-    await runEngine("node (jitless)", scriptName, "node --jitless ./temp.js");
-    await runEngine("hermes", scriptName, "hermes ./temp.js");
+    // await runEngine("bun", scriptName, "bun run ./temp.js");
+    // await runEngine("node", scriptName, "node ./temp.js");
+    // await runEngine("node (jitless)", scriptName, "node --jitless ./temp.js");
+    // await runEngine("hermes", scriptName, "hermes ./temp.js");
     await runEngine("shermes", scriptName, "shermes -O -exec ./temp.js");
-    await runEngine("quickjs", scriptName, "qjs ./temp.js");
-    await runEngine("kiesel", scriptName, "kiesel temp.js");
-    await runEngine("boa", scriptName, "boa ./temp.js");
+    // await runEngine("quickjs", scriptName, "qjs ./temp.js");
+    // await runEngine("kiesel", scriptName, "kiesel temp.js");
+    // await runEngine("boa", scriptName, "boa ./temp.js");
 }
 
 async function main() {
