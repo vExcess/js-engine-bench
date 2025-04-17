@@ -4,13 +4,14 @@
 
 // END IMPORTS
 
-List<int> getPrimeFactors(integer) {
+List<int> getPrimeFactors(int integer) {
     List<int> primeArray = [];
     bool isPrime = false;
 
     // Find divisors starting with 2
-    for (int i = 2; i <= integer; i++) {
-        if (integer % i != 0) continue;
+    double mutInteger = integer.toDouble();
+    for (int i = 2; i <= mutInteger; i++) {
+        if (mutInteger % i != 0) continue;
 
         // Check if the divisor is a prime number
         for (int j = 2; j <= i / 2; j++) {
@@ -19,7 +20,7 @@ List<int> getPrimeFactors(integer) {
 
         if (!isPrime) continue;
         // if the divisor is prime, divide integer with the number and store it in the array
-        integer /= i;
+        mutInteger /= i;
         primeArray.add(i);
     }
 

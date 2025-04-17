@@ -1,40 +1,33 @@
 # js-engine-bench
-A simple to use benchmark for JavaScript engines. This is not a sophisticated benchmark, but should give a decent estimate of how each JS engine will perform on your system. I created this benchmark because I wanted to compare how Static Hermes with its ahead of time compilation would compare to Node.
+Originally a simple to use benchmark for JavaScript engines. This is not a sophisticated benchmark, but should give a decent estimate of how each JS engine will perform on your system. I created this benchmark because I wanted to compare how Static Hermes' ahead of time compilation would compare to Node's JIT compilation.
 
-### Run the Benchmark
-Install all the supported JS engines and then run:
+Since this project's original creation I have added the following non-JavaScript languages to the benchmark: Dart, Zig
+
+Disclaimer: These benchmarks are mostly just tight math loops which may not be representative of your use case.
+
+## Results
+See [https://github.com/vExcess/js-engine-bench/blob/main/results.md](https://github.com/vExcess/js-engine-bench/blob/main/results.md)
+
+## Run the Benchmark
+Install the supported JS engines and then run the following. Apologies to those that don't have Dart installed. I originally wrote the start script in TypeScript, but rewrote it in Dart because Dart is a lot nicer for this type of task.
 ```ts
-npx tsx ./src/js/index.ts
-```
-or
-```ts
-bun run ./src/js/index.ts
+dart run do-benchmarks.dart
 ```
 
-### Benchmark Scripts
+## Benchmark Scripts
 - path tracer :: renders a 3d scene of spheres
 - mandelbrot :: renders a mandelbrot
 - prime factors :: searches for number with the most prime factors
 - gaussian blur :: computes a gaussian blur on an image
 
-### Execution
+## Execution
 Each benchmark is run on each engine for 3 seconds with a 3 second pause between each run to give the CPU a chance to cool down. The time to execute each script is then tracked in milliseconds. I've calibrated each script to take roughly same amount of time on Node.
 
-### Note
-Adding support for more engines is easy, but the engines benchmarked above are the only ones
-that I was interested in.
+## Bench More Things
+Adding support for more engines is easy, simply add them to the `runtimes` object in the top of the `do-benchmarks.dart` file. However, I'm only including engines and languages that I'm interested in to this repo.
 
-### Temporarily Add Engines to Path
+## Temporarily Add Engines to Path
+If you downloaded the engines to the root directory of this repo you can temporarily add them to your path with the following. Make sure to `chmod 755 ` downloaded engine binaries.
 ```
 export PATH="./:$PATH"
-```
-
-### Results
-See the `results.md` file.
-
-
-### Dart Benchmark
-I just ported the JS scripts to Dart so I could benchmark Dart as well. To run the Dart benchmarks use
-```ts
-dart run src/dart/main.dart
 ```

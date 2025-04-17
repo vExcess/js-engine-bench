@@ -1,7 +1,32 @@
 # Results
 
 ## Brief
-Node and Bun are roughly the same speed, however in certain benchmarks Bun is slightly faster. Static Hermes is over twice as fast as Hermes in some benchmarks, but identical to Hermes in others. For a small engine without JIT, QuickJS is surprisingly fast. Kiesel is by far the slowest JS engine, but has been getting significantly faster over time. Disappointingly, Dart is slower than Node despite knowing much more information at compile time.
+Node and Bun are roughly the same speed, however in certain benchmarks Bun is slightly faster. Static Hermes is over twice as fast as Hermes in some benchmarks, but identical to Hermes in others. For a small engine without JIT, QuickJS is surprisingly fast. Kiesel is by far the slowest JS engine, but has been getting significantly faster over time. Disappointingly, Dart is slower than Node despite knowing much more information at compile time. And as expected Zig is incredibly fast even when running in safe mode.
+
+## Apr 17, 2025
+OS: Linux Mint 22.1  
+CPU: AMD Ryzen 8845HS
+
+Note: I fixed how the delta time is calculated (it had an off by one error) so now the times are about double what they were before so compare the relative to Node values when comparing against historical data. Also shermes is still broken.
+|                 | path-trace | mandelbrot | prime-factors | gaussian-blur | Average | Relative to Node |
+| --------- | ---------  | --------- | --------- | --------- | --------- | --------- |
+| zig fast        |        4.7 |       17.1 |          11.9 |           6.2 |    10.0 |             0.59 |
+| zig small       |        6.2 |       17.1 |          17.7 |           6.2 |    11.8 |             0.70 |
+| zig safe        |        6.9 |       17.5 |          11.8 |          12.6 |    12.2 |             0.72 |
+| bun             |       14.3 |       16.9 |          18.0 |          12.8 |    15.5 |             0.91 |
+| node            |       16.2 |       17.7 |          18.2 |          15.8 |    17.0 |             1.00 |
+| dart js -O4     |       21.7 |       16.9 |          23.3 |          19.7 |    20.4 |             1.20 |
+| dart js -O2     |       22.9 |       16.9 |          23.1 |          19.3 |    20.6 |             1.21 |
+| dart js -O3     |       23.7 |       16.9 |          23.5 |          19.2 |    20.8 |             1.23 |
+| dart jit        |       16.3 |       20.4 |          57.0 |          21.5 |    28.8 |             1.70 |
+| dart run        |       16.7 |       20.2 |          59.0 |          22.6 |    29.6 |             1.75 |
+| dart exe        |       27.9 |       20.4 |          74.0 |          18.8 |    35.3 |             2.08 |
+| hermes          |      295.3 |      242.5 |         173.3 |         486.9 |   299.5 |            17.64 |
+| node (jitless)  |      253.3 |      411.3 |         179.2 |         482.9 |   331.6 |            19.53 |
+| quickjs         |      471.3 |      779.8 |         342.2 |         765.0 |   589.6 |            34.73 |
+| boa             |     3780.0 |     3341.0 |        2326.5 |        4826.0 |  3568.4 |           210.18 |
+| kiesel          |     3290.0 |     8450.0 |        2559.0 |        6447.0 |  5186.5 |           305.49 |
+| shermes         |       -1.0 |       -1.0 |          -1.0 |          -1.0 |   Error |            Error |
 
 ## Apr 15, 2025
 OS: Linux Mint 22.1  
