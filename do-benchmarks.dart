@@ -68,6 +68,9 @@ Map<String, Map<String, Object>> runtimes = {
     "dart js -O4": {
         "cmd": "node outO4.js"
     },
+    "wasm (dart)": {
+        "cmd": "node wasm-runner.js"
+    },
 };
 
 Future<void> wait() async {
@@ -216,6 +219,7 @@ Future<void> benchScript(String scriptName) async {
     // compile code
     print("Compiling Dart code...");
     await Process.run("dart", ["compile", "exe", "temp.dart"]);
+    await Process.run("dart", ["compile", "wasm", "temp.dart"]);
     await Process.run("dart", ["compile", "jit-snapshot", "temp.dart"]);
     await Process.run("dart", ["compile", "js", "temp.dart", "-O1", "-o", "outO1.js"]);
     await Process.run("dart", ["compile", "js", "temp.dart", "-O2", "-o", "outO2.js"]);
@@ -236,44 +240,17 @@ Future<void> benchScript(String scriptName) async {
     }
 }
 
-void removeFile(String path) {
-    try {
-        File(path).deleteSync();
-    } catch (e) {
-        // file probably doesn't exist
-    }
-}
-
 void cleanup() {
-    removeFile("./temp.exe");
-    removeFile("./temp.jit");
-    removeFile("./temp.dart");
-
-    removeFile("./temp.js");
-
-    removeFile("./outO1.js");
-    removeFile("./outO1.js.deps");
-    removeFile("./outO1.js.map");
-
-    removeFile("./outO2.js");
-    removeFile("./outO2.js.deps");
-    removeFile("./outO2.js.map");
-
-    removeFile("./outO3.js");
-    removeFile("./outO3.js.deps");
-    removeFile("./outO3.js.map");
-
-    removeFile("./outO4.js");
-    removeFile("./outO4.js.deps");
-    removeFile("./outO4.js.map");
-
-    removeFile("./temp.zig");
-    removeFile("./tempzigsafe");
-    removeFile("./tempzigsmall");
-    removeFile("./tempzigfast");
-    removeFile("./tempzigsafe.o");
-    removeFile("./tempzigsmall.o");
-    removeFile("./tempzigfast.o");
+    Directory("./").listSync().forEach((file) {
+        final fileName = file.uri.pathSegments.last;
+        if (fileName.startsWith("temp") || fileName.startsWith("out")) {
+            try {
+                file.deleteSync();
+            } catch (e) {
+                // file probably doesn't exist
+            }
+        }
+    });
 }
 
 int calcNumCrashes(Map<String, Object> engine) {

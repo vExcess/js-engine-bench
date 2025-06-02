@@ -3,6 +3,31 @@
 ## Brief
 Node and Bun are roughly the same speed, however in certain benchmarks Bun is slightly faster. Static Hermes is over twice as fast as Hermes in some benchmarks, but identical to Hermes in others. For a small engine without JIT, QuickJS is surprisingly fast. Kiesel is by far the slowest JS engine, but has been getting significantly faster over time. Disappointingly, Dart is slower than Node despite knowing much more information at compile time. And as expected Zig is incredibly fast even when running in safe mode.
 
+## June 1, 2025
+OS: Linux Mint 22.1  
+CPU: AMD Ryzen 8845HS
+
+|                 | path-trace | mandelbrot | prime-factors | gaussian-blur | Average | Relative to Node |
+| --------- | ---------  | --------- | --------- | --------- | --------- | --------- |
+| zig fast        |        4.7 |       17.2 |          11.8 |           6.2 |    10.0 |             0.59 |
+| zig small       |        6.3 |       17.1 |          17.7 |           6.2 |    11.8 |             0.70 |
+| zig safe        |        6.9 |       17.5 |          11.8 |          11.9 |    12.1 |             0.72 |
+| bun             |       14.3 |       16.9 |          18.2 |          10.9 |    15.1 |             0.90 |
+| node            |       15.8 |       17.5 |          18.0 |          16.0 |    16.8 |             1.00 |
+| dart js -O4     |       21.8 |       17.0 |          23.2 |          19.4 |    20.3 |             1.21 |
+| dart js -O2     |       22.8 |       17.0 |          22.6 |          19.8 |    20.6 |             1.22 |
+| dart js -O3     |       22.8 |       17.0 |          23.7 |          19.5 |    20.7 |             1.23 |
+| dart jit        |       16.8 |       20.4 |          57.5 |          21.5 |    29.0 |             1.73 |
+| dart run        |       16.5 |       20.4 |          59.9 |          22.0 |    29.7 |             1.77 |
+| dart exe        |       27.7 |       20.1 |          71.2 |          19.1 |    34.5 |             2.05 |
+| wasm (dart)     |       59.9 |       57.2 |         187.9 |          43.7 |    87.2 |             5.19 |
+| hermes          |      298.1 |      244.4 |         161.4 |         434.3 |   284.5 |            16.93 |
+| node (jitless)  |      249.8 |      395.5 |         164.5 |         506.0 |   328.9 |            19.57 |
+| quickjs         |      463.4 |      744.8 |         329.5 |         812.8 |   587.6 |            34.96 |
+| boa             |     3816.0 |     3384.0 |        2292.5 |        4758.0 |  3562.6 |           211.95 |
+| kiesel          |     3315.0 |     8409.0 |        2624.0 |        6459.0 |  5201.8 |           309.46 |
+| shermes         |       -1.0 |       -1.0 |          -1.0 |          -1.0 |   Error |            Error |
+
 ## Apr 17, 2025
 OS: Linux Mint 22.1  
 CPU: AMD Ryzen 8845HS
