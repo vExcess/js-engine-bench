@@ -71,6 +71,9 @@ Map<String, Map<String, Object>> runtimes = {
     "wasm (dart)": {
         "cmd": "node wasm-runner.js"
     },
+    "python": {
+        "cmd": "python3 ./temp.py"
+    },
 };
 
 Future<void> wait() async {
@@ -192,6 +195,27 @@ String genJSWithBoilerplate(String contents) {
     return tempContents;
 }
 
+String genPythonWithBoilerplate(String contents) {
+    final tempContents = """
+import time
+
+def get_milliseconds():
+    return round(time.time() * 1000)
+
+TIME_LIMIT = ${benchtime}
+""" + "\n" + contents + """
+start = get_milliseconds()
+iterations = 0
+while (get_milliseconds() - start < TIME_LIMIT):
+    benchit()
+    iterations += 1
+
+end = get_milliseconds()
+print((end - start) / iterations)
+""";
+    return tempContents;
+}
+
 Future<void> benchScript(String scriptName) async {
     // init stat storage
     for (final engineName in runtimes.keys) {
@@ -206,12 +230,17 @@ Future<void> benchScript(String scriptName) async {
     final jsContents = genJSWithBoilerplate(jsFile.readAsStringSync());
     File("./temp.js").writeAsStringSync(jsContents);
 
+    // generate python temp source file
+    final pyFile = File("./benchmark-scripts/python/${scriptName}.py");
+    final pyContents = genPythonWithBoilerplate(pyFile.readAsStringSync());
+    File("./temp.py").writeAsStringSync(pyContents);
+
     // generate dart temp source file
     final dartFile = File("./benchmark-scripts/dart/${scriptName}.dart");
     final dartContents = genDartWithBoilerplate(dartFile.readAsStringSync());
     File("./temp.dart").writeAsStringSync(dartContents);
 
-    // generate dart temp source file
+    // generate zig temp source file
     final zigFile = File("./benchmark-scripts/zig/${scriptName}.zig");
     final zigContents = genZigWithBoilerplate(zigFile.readAsStringSync());
     File("./temp.zig").writeAsStringSync(zigContents);
