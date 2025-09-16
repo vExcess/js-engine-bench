@@ -143,11 +143,14 @@ String genZigWithBoilerplate(String contents) {
     final importContents = contents.substring(0, endImportsIdx);
     final codeContents = contents.substring(endImportsIdx);
     final tempContents = importContents + """
-        var stdout: std.fs.File.Writer = undefined;
+        var stdoutWriter: std.fs.File.Writer = undefined;
+        var stdoutBuffer: [1024]u8 = undefined;
         const vexlib = @import("./vexlib.zig");
         const Float = vexlib.Float;
         fn print(x: f64) void {
+            const stdout = &stdoutWriter.interface;
             stdout.print("{s}\\n", .{ Float.toString(x, 10).raw() }) catch @panic("PRINT FAILED");
+            stdout.flush() catch @panic("PRINT FAILED");
         }
         fn get_milliseconds() i64 {
             return @divTrunc(std.time.microTimestamp(), 1000);
@@ -159,7 +162,7 @@ String genZigWithBoilerplate(String contents) {
             const allocator = generalPurposeAllocator.allocator();
             vexlib.init(&allocator);
 
-            stdout = std.io.getStdOut().writer();
+            stdoutWriter = std.fs.File.stdout().writer(&stdoutBuffer);
 
             const start = get_milliseconds();
             var iterations: f64 = 0;
