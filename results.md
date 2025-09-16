@@ -1,4 +1,5 @@
 # Results
+All comparisons are done against the latest LTS version of Node at the time of the benchmarking.
 
 ## Brief
 Node and Bun are roughly the same speed, however in certain benchmarks Bun is slightly faster. Static Hermes is over twice as fast as Hermes in some benchmarks, but identical to Hermes in others. For a small engine without JIT, QuickJS is surprisingly fast. Kiesel is by far the slowest JS engine, but has been getting significantly faster over time. Disappointingly, Dart is slower than Node despite knowing much more information at compile time. And as expected Zig is incredibly fast even when running in safe mode.
