@@ -156,10 +156,10 @@ function benchit() {
         height: 800,
         data: new Uint8ClampedArray(800 * 800 * 4)
     };
-    let x = 0;
-    let y = 0;
-    let w = 800;
-    let h = 800;
+    var x = 0;
+    var y = 0;
+    var w = 800;
+    var h = 800;
     var radius = 0.5;
     var p = imageData.data;
 

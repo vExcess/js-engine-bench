@@ -44,6 +44,9 @@ Map<String, Map<String, Object>> runtimes = {
     "quickjs": {
         "cmd": "./qjs ./temp.js"
     },
+    "microquickjs": {
+        "cmd": "./mqjs ./temp.js"
+    },
     "kiesel": {
         "cmd": "./kiesel temp.js"
     },
@@ -183,16 +186,16 @@ String genJSWithBoilerplate(String contents) {
         if (typeof print === "undefined") {
             print = console.log;
         }
-        const get_milliseconds = Date.now;
-        const TIME_LIMIT = ${benchtime};
+        var get_milliseconds = Date.now;
+        var TIME_LIMIT = ${benchtime};
     """ + "\n" + contents + """
-        const start = get_milliseconds();
-        let iterations = 0;
+        var start = get_milliseconds();
+        var iterations = 0;
         while (get_milliseconds() - start < TIME_LIMIT) {
             benchit();
             iterations += 1;
         }
-        const end = get_milliseconds();
+        var end = get_milliseconds();
         print((end - start) / iterations);
     """;
     return tempContents;

@@ -15,6 +15,7 @@ dart run do-benchmarks.dart
 ```
 
 ## Benchmark Scripts
+Note: JS versions of benchmarks must be in ES5 because mquickjs doesn't support ES6
 - path tracer :: renders a 3d scene of spheres
 - mandelbrot :: renders a mandelbrot
 - prime factors :: searches for number with the most prime factors

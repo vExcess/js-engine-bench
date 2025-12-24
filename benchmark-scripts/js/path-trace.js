@@ -136,7 +136,15 @@ function pathTrace(o, d, s) {
 
 var its = 1;
 
-var colorBuffer = new Float32Array(400*400*4).fill(0);
+var colorBuffer = new Float32Array(400*400*4);
+// microquickjs doesn't support Array.fill
+if (typeof colorBuffer.fill === "function") {
+    colorBuffer.fill(0);
+} else {
+    for (var i = 0; i < colorBuffer.length; i++) {
+        colorBuffer[i] = 0;
+    }
+}
 
 var scene = [
     // Red sphere
@@ -159,8 +167,8 @@ var scene = [
     [0, 10001, 5, 10000],
     [1, 1, 1, 0.5, 0.9, 0.1]
 ];
-const WIDTH = 210;
-const HEIGHT = 210;
+var WIDTH = 210;
+var HEIGHT = 210;
 var idg = {
     width: WIDTH,
     height: HEIGHT,

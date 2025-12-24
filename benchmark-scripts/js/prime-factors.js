@@ -3,15 +3,15 @@
 */
 
 function getPrimeFactors(integer) {
-    const primeArray = [];
-    let isPrime;
+    var primeArray = [];
+    var isPrime;
 
     // Find divisors starting with 2
-    for (let i = 2; i <= integer; i++) {
+    for (var i = 2; i <= integer; i++) {
         if (integer % i !== 0) continue;
 
         // Check if the divisor is a prime number
-        for (let j = 2; j <= i / 2; j++) {
+        for (var j = 2; j <= i / 2; j++) {
             isPrime = i % j !== 0;
         }
 
@@ -24,14 +24,14 @@ function getPrimeFactors(integer) {
     return primeArray;
 }
 
-let maxFactors = 0;
-let maxFactorsNum = 0;
+var maxFactors = 0;
+var maxFactorsNum = 0;
 
 function benchit() {
     maxFactors = 0;
     maxFactorsNum = 0;
-    for (let i = 1; i < 9450; i++) {
-        const factors = getPrimeFactors(i);
+    for (var i = 1; i < 9450; i++) {
+        var factors = getPrimeFactors(i);
         if (factors.length > maxFactors) {
             maxFactors = factors.length;
             maxFactorsNum = i;
