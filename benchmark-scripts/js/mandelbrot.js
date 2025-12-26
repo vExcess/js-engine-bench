@@ -3,7 +3,7 @@
     under MIT License
 */
 
-var pixels = new Uint8ClampedArray(600 * 600);
+var pixels = new Uint8ClampedArray(600 * 600 * 4);
 var _abs = Math.abs;
 var _sqrt = Math.sqrt;
 
